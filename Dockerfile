@@ -17,7 +17,14 @@ RUN apt-get install -y \
 	php5-cli \
 	libapache2-mod-php5
 
-RUN apt-get install -y git
+# Jarva!
+RUN apt-get install -y openjdk-7-jdk
+
+# Build tools
+RUN apt-get install -y \
+	git \
+	wget \
+	make
 
 #COPY nodesource.gpg.key /tmp/nodesource.gpg.key
 #RUN add-apt-repository -y -r ppa:chris-lea/node.js && \
@@ -26,13 +33,18 @@ RUN apt-get install -y git
 #	apt-get update -y && \
 #	apt-get install -y nodejs
 # Blah whatever
-RUN apt-get install -y wget
 RUN wget -qO- https://deb.nodesource.com/setup_4.x | sudo bash - && \
 	apt-get install -y nodejs
 
 # Install handy utilities for interactive use
 RUN apt-get install -y tig emacs24-nox screen php-elisp
-	
+
+# Install composer
+RUN wget https://getcomposer.org/installer -O - | php && mv composer.phar /usr/local/bin/composer
+
+# Check out the deployment manager scripts
+RUN git clone 'https://github.com/EarthlingInteractive/PhrebarDeploymentManager.git' /root/PhrebarDeploymentManager
+
 # Add some scripts
 COPY start-da-servers.sh /etc/start-da-servers
 COPY run-da-servers.sh /etc/run-da-servers
