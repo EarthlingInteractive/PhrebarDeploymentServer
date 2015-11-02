@@ -3,6 +3,6 @@
 
 set -euo pipefail
 
-/etc/start-da-servers
-
-exec sleep infinity
+/etc/init.d/apache2 start
+/etc/init.d/postgresql start
+exec /root/PhrebarDeploymentManager/deployment-server "$@"

@@ -1,5 +1,14 @@
 FROM ubuntu:14.04
 
+# Fix locales so that en_US.utf8 works???
+RUN apt-get install -y locales && \
+    localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+#RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
+#RUN update-locale LANG="en_US.UTF-8" && \
+#    update-locale LANGUAGE="en_US.UTF-8" && \
+#    update-locale LC_ALL="en_US.UTF-8"
+
 # Important stuff!
 COPY ACCC4CF8.asc /tmp/ACCC4CF8.asc
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' >>/etc/apt/sources.list.d/pgdg.list && \
@@ -15,6 +24,7 @@ RUN apt-get install -y \
 	apache2 \
 	php5 \
 	php5-cli \
+	php5-pgsql \
 	libapache2-mod-php5
 
 # Jarva!
@@ -45,17 +55,20 @@ RUN wget https://getcomposer.org/installer -O - | php && mv composer.phar /usr/l
 RUN mkdir /home/ppdo && useradd -s /bin/bash -d /home/ppdo ppdo && chown ppdo:ppdo /home/ppdo
 
 # Check out the deployment manager scripts
-RUN git clone 'https://github.com/EarthlingInteractive/PhrebarDeploymentManager.git' /root/PhrebarDeploymentManager && \
+RUN mkdir /root/PhrebarDeploymentManager && \
     cd /root/PhrebarDeploymentManager && \
-    cp config.json.example config.json
+    git init && \
+    git remote add github 'https://github.com/EarthlingInteractive/PhrebarDeploymentManager.git' && \
+    git fetch --all && \
+    git reset --hard bd14f268ab28b6beb3943f27a89bceb766e607f7 && \
+    sed -e 's#deployments#/home/ppdo/deployments#' config.json.example >config.json
 
-# Add some scripts
+# Add some dotfiles
 COPY home/ /root/
-COPY start-da-servers.sh /etc/start-da-servers
-COPY run-da-servers.sh /etc/run-da-servers
-COPY run-da-servers-interactive.sh /etc/run-da-servers-interactive
-RUN chmod +0755 /etc/start-da-servers /etc/run-da-servers /etc/run-da-servers-interactive
 
 EXPOSE 80
 
-CMD /etc/run-da-servers
+ENTRYPOINT \
+	/etc/init.d/apache2 start && \
+	/etc/init.d/postgresql start && \
+	exec /root/PhrebarDeploymentManager/deployment-server
