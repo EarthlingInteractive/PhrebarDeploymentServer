@@ -46,6 +46,7 @@ RUN wget https://getcomposer.org/installer -O - | php && mv composer.phar /usr/l
 RUN git clone 'https://github.com/EarthlingInteractive/PhrebarDeploymentManager.git' /root/PhrebarDeploymentManager
 
 # Add some scripts
+COPY home/ /root/
 COPY start-da-servers.sh /etc/start-da-servers
 COPY run-da-servers.sh /etc/run-da-servers
 COPY run-da-servers-interactive.sh /etc/run-da-servers-interactive
