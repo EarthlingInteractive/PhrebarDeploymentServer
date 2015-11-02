@@ -42,8 +42,12 @@ RUN apt-get install -y tig emacs24-nox screen php-elisp
 # Install composer
 RUN wget https://getcomposer.org/installer -O - | php && mv composer.phar /usr/local/bin/composer
 
+RUN mkdir /home/ppdo && useradd -s /bin/bash -d /home/ppdo ppdo && chown ppdo:ppdo /home/ppdo
+
 # Check out the deployment manager scripts
-RUN git clone 'https://github.com/EarthlingInteractive/PhrebarDeploymentManager.git' /root/PhrebarDeploymentManager
+RUN git clone 'https://github.com/EarthlingInteractive/PhrebarDeploymentManager.git' /root/PhrebarDeploymentManager && \
+    cd /root/PhrebarDeploymentManager && \
+    cp config.json.example config.json
 
 # Add some scripts
 COPY home/ /root/
