@@ -52,6 +52,9 @@ RUN apt-get install -y tig emacs24-nox screen php-elisp
 # Install composer
 RUN wget https://getcomposer.org/installer -O - | php && mv composer.phar /usr/local/bin/composer
 
+# Enable some apache modules
+RUN a2enmod rewrite
+
 RUN mkdir /home/ppdo && useradd -s /bin/bash -d /home/ppdo ppdo && chown ppdo:ppdo /home/ppdo
 
 # Check out the deployment manager scripts
