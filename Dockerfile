@@ -68,10 +68,9 @@ RUN mkdir /root/PhrebarDeploymentManager && \
 
 # Add some dotfiles
 COPY home/ /root/
+# And some programs
+COPY bin/ /usr/local/bin/
 
 EXPOSE 80
 
-ENTRYPOINT \
-	/etc/init.d/apache2 start && \
-	/etc/init.d/postgresql start && \
-	exec /root/PhrebarDeploymentManager/deployment-server
+CMD phrebar-deployment-server
